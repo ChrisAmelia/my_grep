@@ -15,7 +15,7 @@ fn main() -> Result<(), std::io::Error> {
 
     matches?
         .iter()
-        .for_each(|result| println!("{}::{}", result.line_number, result.line));
+        .for_each(|result| println!("{result}"));
 
     Ok(())
 }

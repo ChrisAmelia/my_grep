@@ -1,13 +1,6 @@
-use crate::Flag;
+use crate::{matches::Match, Flag};
 
 mod grep_test;
-
-/// A `Match` is the result of finding the input characters
-#[derive(Debug, PartialEq)]
-pub struct Match {
-    pub line_number: u32,
-    pub line: String
-}
 
 /// Returns a list of matches for the given `pattern`.
 ///
