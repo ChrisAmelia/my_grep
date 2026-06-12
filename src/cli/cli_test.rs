@@ -7,11 +7,11 @@ mod tests {
     #[test]
     fn test_parse_flags() {
         // No flags
-        let args = vec!["grep", "hello.txt", "lorem"];
+        let args = vec!["grep", "lorem", "hello.txt"];
         assert!(parse_flags(&args).is_empty());
 
         // -i, -n
-        let args = vec!["grep", "hello.txt", "lorem", "-i", "-n"];
+        let args = vec!["grep", "lorem", "hello.txt", "-i", "-n"];
         assert_eq!(vec![Flag::Insensitive, Flag::ShowLineNumber], parse_flags(&args));
     }
 
@@ -22,18 +22,18 @@ mod tests {
         assert_eq!(Err(ErrorKind::NotFound), get_filename(&args).map_err(|e| e.kind()));
 
         // Filename given
-        let args = vec!["grep", "-i", "-n", "hello_world.txt", "lorem"];
+        let args = vec!["grep", "-i", "-n", "lorem", "hello_world.txt"];
         assert_eq!("hello_world.txt", get_filename(&args).unwrap());
     }
 
     #[test]
     fn test_get_pattern() {
         // No pattern
-        let args = vec!["grep", "-i", "-n", "hello_world.txt"];
+        let args = vec!["grep", "-i", "-n"];
         assert_eq!(Err(ErrorKind::NotFound), get_pattern(&args).map_err(|e| e.kind()));
 
         // Pattern given
-        let args = vec!["grep", "-i", "-n", "hello_world.txt", "lorem"];
+        let args = vec!["grep", "-i", "-n", "lorem", "hello_world.txt"];
         assert_eq!("lorem", get_pattern(&args).unwrap());
     }
 }

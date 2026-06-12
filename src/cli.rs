@@ -7,21 +7,21 @@ mod cli_test;
 
 /// Returns the filename.
 pub fn get_filename<'a>(args: &'a [&'a str]) -> Result<&'a str, io::Error> {
-    let mut args = args.iter().skip(1);
-
-    match args.find(|arg| !arg.starts_with("-")) {
-        Some(arg) => Ok(arg),
-        None      => Err(io::Error::new(ErrorKind::NotFound, "No filename given"))
-    }
-}
-
-/// Returns the pattern.
-pub fn get_pattern<'a>(args: &'a [&'a str]) -> Result<&'a str, io::Error> {
     let mut args = args.iter().skip(1).filter(|arg| !arg.starts_with("-"));
 
     match args.nth(1) {
         Some(arg) => Ok(arg),
         None      => Err(io::Error::new(ErrorKind::NotFound, "No pattern given")),
+    }
+}
+
+/// Returns the pattern.
+pub fn get_pattern<'a>(args: &'a [&'a str]) -> Result<&'a str, io::Error> {
+    let mut args = args.iter().skip(1);
+
+    match args.find(|arg| !arg.starts_with("-")) {
+        Some(arg) => Ok(arg),
+        None      => Err(io::Error::new(ErrorKind::NotFound, "No pattern given"))
     }
 }
 
