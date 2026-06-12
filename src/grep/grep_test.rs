@@ -19,6 +19,13 @@ mod tests {
     }
 
     #[test]
+    fn grep_with_inexistant_word_should_empty_result() {
+        let result: Vec<Match> = grep(FILE_TEST, "english", &[]).unwrap();
+
+        assert!(result.is_empty())
+    }
+
+    #[test]
     fn grep_should_show_two_results() {
         let result: Vec<Match> = grep(FILE_TEST, "ipsum", &[]).unwrap();
 
