@@ -1,58 +1,57 @@
 #[cfg(test)]
 mod tests {
-    use crate::{grep::{grep, Match}, Flag};
+    use crate::{grep::{search_in_one_file, FileMatch}, Flag};
 
     const FILE_TEST: &str = "src/hello_world.txt";
 
     #[test]
-    fn grep_with_inexistant_file_should_error_not_found() {
-        let result = grep("not_found.txt", "impossible", &[]).map_err(|e| e.kind());
+    fn search_in_one_file_with_inexistant_file_should_error_not_found() {
+        let result = search_in_one_file("not_found.txt", "impossible", &[]).map_err(|e| e.kind());
         assert_eq!(Err(std::io::ErrorKind::NotFound), result)
     }
 
     #[test]
-    fn grep_should_show_line_2() {
-        let result: Vec<Match> = grep(FILE_TEST, "dolor", &[]).unwrap();
+    fn search_in_one_file_should_show_line_2() {
+        let result: FileMatch = search_in_one_file(FILE_TEST, "dolor", &[]).unwrap();
 
-        assert_eq!(1, result[0].line_number);
-        assert_eq!("dolor sit amet", result[0].line);
+        assert_eq!(1, result.lines[0].index);
+        assert_eq!("dolor sit amet", result.lines[0].content);
     }
 
     #[test]
-    fn grep_with_inexistant_word_should_empty_result() {
-        let result: Vec<Match> = grep(FILE_TEST, "english", &[]).unwrap();
+    fn search_in_one_file_with_inexistant_word_should_empty_result() {
+        let result: FileMatch = search_in_one_file(FILE_TEST, "english", &[]).unwrap();
 
-        assert!(result.is_empty())
+        assert!(result.lines.is_empty());
     }
 
     #[test]
-    fn grep_should_show_two_results() {
-        let result: Vec<Match> = grep(FILE_TEST, "ipsum", &[]).unwrap();
+    fn search_in_one_file_should_show_two_results() {
+        let result: FileMatch = search_in_one_file(FILE_TEST, "ipsum", &[]).unwrap();
 
-        assert_eq!(0, result[0].line_number);
-        assert_eq!("lorem ipsum", result[0].line);
+        assert_eq!(0, result.lines[0].index);
+        assert_eq!("lorem ipsum", result.lines[0].content);
 
-        assert_eq!(2, result[1].line_number);
-        assert_eq!("lorem ipsum dolor", result[1].line);
+        assert_eq!(2, result.lines[1].index);
+        assert_eq!("lorem ipsum dolor", result.lines[1].content);
     }
 
     #[test]
-    fn grep_should_return_with_empty() {
-        let result: Vec<Match> = grep(FILE_TEST, "hello world", &[]).unwrap();
+    fn search_in_one_file_should_return_with_empty() {
+        let result: FileMatch = search_in_one_file(FILE_TEST, "hello world", &[]).unwrap();
 
-        assert!(result.is_empty());
+        assert!(result.lines.is_empty());
     }
 
     #[test]
-    fn grep_insensitive_test() {
+    fn search_in_one_file_insensitive_test() {
         // Looking for "DOLOR", note the uppercased word
-        let result: Vec<Match> = grep(FILE_TEST, "DOLOR", &[]).unwrap();
-        dbg!(&result);
-        assert!(result.is_empty());
+        let result: FileMatch = search_in_one_file(FILE_TEST, "DOLOR", &[]).unwrap();
+        assert!(result.lines.is_empty());
 
         // Looking for "DOLOR", with -i set
-        let result: Vec<Match> = grep(FILE_TEST, "DOLOR", &[Flag::Insensitive]).unwrap();
-        assert_eq!(1, result[0].line_number);
-        assert_eq!("dolor sit amet", result[0].line);
+        let result: FileMatch = search_in_one_file(FILE_TEST, "DOLOR", &[Flag::Insensitive]).unwrap();
+        assert_eq!(1, result.lines[0].index);
+        assert_eq!("dolor sit amet", result.lines[0].content);
     }
 }

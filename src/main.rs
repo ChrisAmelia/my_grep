@@ -1,7 +1,7 @@
 use std::env;
 
 use my_grep::cli;
-use my_grep::grep::grep;
+use my_grep::grep::search_in_one_file;
 
 fn main() -> Result<(), std::io::Error> {
     let args: Vec<String> = env::args().collect();
@@ -11,11 +11,9 @@ fn main() -> Result<(), std::io::Error> {
     let word = cli::get_pattern(args)?;
     let flags = cli::parse_flags(args);
 
-    let matches = grep(filename, word, &flags);
+    let matches = search_in_one_file(filename, word, &flags)?;
 
-    matches?
-        .iter()
-        .for_each(|result| println!("{result}"));
+    println!("{matches}");
 
     Ok(())
 }
