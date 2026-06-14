@@ -7,7 +7,8 @@ pub struct Line {
     pub content: String
 }
 
-/// A `Match` contains all the matches.
+/// A `FileMatch` is essentially a 2-tuple of a filename and a list of [Line]
+/// matching the pattern.
 #[derive(Debug, PartialEq)]
 pub struct FileMatch {
     pub filename: String,

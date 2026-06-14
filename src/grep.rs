@@ -4,18 +4,21 @@ use crate::{matches::{FileMatch, Line}, Flag};
 
 mod grep_test;
 
-/// Returns a list of matches for the given `pattern`.
+/// Returns a list of matches for the given `query` in the given `filename`.
 ///
 /// # Parameters
 ///
 /// * `filename`: searches for `word` in that file.
-/// * `query`: The word to look for.
-/// * `flags`: A list of [Flag].
+/// * `query`: the pattern to look for.
+/// * `flags`: a list of [Flag].
 ///
 /// # Returns
 ///
-/// * `Ok(Vec<Match>)`: a vector of matches.
-/// * `Err(std::io::Error)`: An error message if the file cannot be read or accessed.
+/// * `Ok(Vec<FileMatch>)`: a vector of [FileMatch].
+///
+/// # Errors
+///
+/// This function will error if `std::fs::read_to_string()` fails.
 pub fn search_in_one_file(filename: &str, query: &str, flags: &[Flag]) -> Result<FileMatch, io::Error> {
     let contents = std::fs::read_to_string(filename)?;
 
@@ -31,6 +34,19 @@ pub fn search_in_one_file(filename: &str, query: &str, flags: &[Flag]) -> Result
     Ok(FileMatch { filename: filename.to_string(), lines })
 }
 
+/// Returns a list of matches for the given `query`.
+///
+/// This function will look in every file in the current working directory.
+///
+/// # Parameters
+///
+/// * `query`: the pattern to look for.
+/// * `flags`: a list of [Flag].
+///
+/// # Errors
+///
+/// This function will return an error if `std::fs::read_dir()` fails or if `search_in_one_file()`
+/// fails.
 pub fn search_in_all_files_in_cwd(query: &str, flags: &[Flag]) -> Result<Vec<FileMatch>, io::Error> {
     let entries = fs::read_dir(".")?;
     let filenames: Vec<String> = entries
@@ -57,7 +73,16 @@ pub fn search_in_all_files_in_cwd(query: &str, flags: &[Flag]) -> Result<Vec<Fil
 
 /// Searches for `query` in `contents`.
 ///
-/// Returns the list of [Match].
+/// Returns the list of [Line].
+///
+/// # Parameters
+///
+/// * `contents`: file's contents.
+/// * `query`: the pattern to look for.
+///
+/// # Returns
+///
+/// All the lines matching `query`, result can be empty.
 fn search(contents: &str, query: &str) -> Vec<Line> {
     contents
         .lines()
@@ -75,6 +100,15 @@ fn search(contents: &str, query: &str) -> Vec<Line> {
 /// Searches for `query` (insensitive) in `contents`.
 ///
 /// Returns a list of [Match].
+///
+/// # Parameters
+///
+/// * `contents`: file's contents.
+/// * `query`: the pattern to look for.
+///
+/// # Returns
+///
+/// All the lines matching `query` (insensitive), result can be empty.
 fn search_case_insensitive(contents: &str, query: &str) -> Vec<Line> {
     contents
         .lines()
