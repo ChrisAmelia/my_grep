@@ -16,7 +16,7 @@ The executable will be present in `target/release`.
 minigrep [-flags] [word] [file1] [file2] [file3] ...
 ```
 
-Note that the files are optional, if none are provided then `minigrep` looks in all files in the current working directory.
+Note that the files are optional, if none are provided then `minigrep` looks in all files in the current working directory.  
 For now, minigrep only supports `-i/--insensitive` flag.
 
 ## Testing
