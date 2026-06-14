@@ -4,7 +4,6 @@
 )]
 pub enum Flag {
     Insensitive,
-    ShowLineNumber,
 }
 
 pub mod grep;

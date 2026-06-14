@@ -2,7 +2,7 @@
 mod tests {
     use std::io::ErrorKind;
 
-    use crate::cli::{get_filename, get_pattern, parse_flags, Flag};
+    use crate::cli::{get_filenames, get_pattern, parse_flags, Flag};
 
     #[test]
     fn test_parse_flags() {
@@ -10,20 +10,28 @@ mod tests {
         let args = vec!["grep", "lorem", "hello.txt"];
         assert!(parse_flags(&args).is_empty());
 
-        // -i, -n
-        let args = vec!["grep", "lorem", "hello.txt", "-i", "-n"];
-        assert_eq!(vec![Flag::Insensitive, Flag::ShowLineNumber], parse_flags(&args));
+        // -i
+        let args = vec!["grep", "lorem", "hello.txt", "-i"];
+        assert_eq!(vec![Flag::Insensitive], parse_flags(&args));
     }
 
     #[test]
-    fn test_get_filename() {
+    fn test_get_filenames() {
         // No filename
-        let args = vec!["grep", "-i", "-n"];
-        assert_eq!(Err(ErrorKind::NotFound), get_filename(&args).map_err(|e| e.kind()));
+        let args = vec!["grep", "-i"];
+        assert!(get_filenames(&args).is_none());
 
         // Filename given
-        let args = vec!["grep", "-i", "-n", "lorem", "hello_world.txt"];
-        assert_eq!("hello_world.txt", get_filename(&args).unwrap());
+        let args = vec!["grep", "lorem", "hello_world.txt"];
+        assert_eq!("hello_world.txt", get_filenames(&args).unwrap()[0]);
+
+        // Multiple files
+        let args = vec!["grep", "lorem", "file1.txt", "file2.txt", "file3.txt"];
+        let filenames = get_filenames(&args).unwrap();
+
+        assert_eq!("file1.txt", filenames[0]);
+        assert_eq!("file2.txt", filenames[1]);
+        assert_eq!("file3.txt", filenames[2]);
     }
 
     #[test]

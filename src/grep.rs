@@ -48,7 +48,9 @@ pub fn search_in_all_files_in_cwd(query: &str, flags: &[Flag]) -> Result<Vec<Fil
     let matches: Vec<FileMatch> = filenames
         .iter()
         .map(|filename| search_in_one_file(filename, query, flags))
-        .collect::<Result<Vec<_>, _>>()?;
+        .filter_map(|result| result.ok())
+        .filter(|file_match| !file_match.lines.is_empty())
+        .collect();
 
     Ok(matches)
 }

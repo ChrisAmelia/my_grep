@@ -5,13 +5,19 @@ use crate::Flag;
 
 mod cli_test;
 
-/// Returns the filename.
-pub fn get_filename<'a>(args: &'a [&'a str]) -> Result<&'a str, io::Error> {
-    let mut args = args.iter().skip(1).filter(|arg| !arg.starts_with("-"));
+/// Returns the filenames
+pub fn get_filenames<'a>(args: &'a [&'a str]) -> Option<Vec<&'a str>> {
+    let args = args.iter().skip(2); // skip program name and first argument (pattern)
 
-    match args.nth(1) {
-        Some(arg) => Ok(arg),
-        None      => Err(io::Error::new(ErrorKind::NotFound, "No pattern given")),
+    let filenames: Vec<&str> = args
+        .filter(|arg| !arg.starts_with("-"))
+        .copied()
+        .collect();
+
+    if filenames.is_empty() {
+        None
+    } else {
+        Some(filenames)
     }
 }
 
@@ -33,7 +39,6 @@ pub fn parse_flags(args: &[&str]) -> Vec<Flag> {
     for arg in args {
         match *arg {
             "-i" | "--insensitive"      => flags.push(Flag::Insensitive),
-            "-n" | "--show-line-number" => flags.push(Flag::ShowLineNumber),
             _ => continue,
         }
     }
