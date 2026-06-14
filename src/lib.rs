@@ -7,5 +7,4 @@ pub enum Flag {
 }
 
 pub mod grep;
-pub mod cli;
 pub mod matches;

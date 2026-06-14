@@ -1,6 +1,6 @@
 use std::{fs, io};
 
-use crate::{matches::{FileMatch, Line}, Flag};
+use crate::{matches::{FileMatch, Line}};
 
 mod grep_test;
 
@@ -19,13 +19,10 @@ mod grep_test;
 /// # Errors
 ///
 /// This function will error if `std::fs::read_to_string()` fails.
-pub fn search_in_one_file(filename: &str, query: &str, flags: &[Flag]) -> Result<FileMatch, io::Error> {
+pub fn search_in_one_file(filename: &str, query: &str, insensitive: bool) -> Result<FileMatch, io::Error> {
     let contents = std::fs::read_to_string(filename)?;
 
-    let case_insensitive = flags
-        .contains(&Flag::Insensitive);
-
-    let lines = if case_insensitive {
+    let lines = if insensitive {
         search_case_insensitive(&contents, query)
     } else {
         search(&contents, query)
@@ -47,7 +44,7 @@ pub fn search_in_one_file(filename: &str, query: &str, flags: &[Flag]) -> Result
 ///
 /// This function will return an error if `std::fs::read_dir()` fails or if `search_in_one_file()`
 /// fails.
-pub fn search_in_all_files_in_cwd(query: &str, flags: &[Flag]) -> Result<Vec<FileMatch>, io::Error> {
+pub fn search_in_all_files_in_cwd(query: &str, insensitive: bool) -> Result<Vec<FileMatch>, io::Error> {
     let entries = fs::read_dir(".")?;
     let filenames: Vec<String> = entries
         .filter_map(|entry| {
@@ -63,7 +60,7 @@ pub fn search_in_all_files_in_cwd(query: &str, flags: &[Flag]) -> Result<Vec<Fil
 
     let matches: Vec<FileMatch> = filenames
         .iter()
-        .map(|filename| search_in_one_file(filename, query, flags))
+        .map(|filename| search_in_one_file(filename, query, insensitive))
         .filter_map(|result| result.ok())
         .filter(|file_match| !file_match.lines.is_empty())
         .collect();
